@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/lazywei/go-opencv/opencv"
 	"io/ioutil"
 	"net/http"
@@ -10,7 +11,14 @@ import (
 	"path"
 )
 
+type Config struct {
+	FACEAPIKEY string
+}
+
 func main() {
+	var config Config
+	envconfig.Process("", &config)
+
 	win := opencv.NewWindow("Go-OpenCV Webcam Face Detection")
 	defer win.Destroy()
 
@@ -48,7 +56,7 @@ func main() {
 
 				if key == 32 {
 					opencv.SaveImage("test.png", img, nil)
-					go post()
+					go post(config)
 				}
 			} else {
 				fmt.Println("nil image")
@@ -61,7 +69,7 @@ func main() {
 	}
 }
 
-func post() {
+func post(config Config) {
 	file, err := os.Open("test.png")
 	defer file.Close()
 
@@ -73,7 +81,7 @@ func post() {
 	}
 
 	r.Header.Add("Content-Type", "application/octet-stream")
-	r.Header.Add("Ocp-Apim-Subscription-Key", os.Getenv("FACEAPIKEY"))
+	r.Header.Add("Ocp-Apim-Subscription-Key", config.FACEAPIKEY)
 
 	resp, err := c.Do(r)
 
