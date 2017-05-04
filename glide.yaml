@@ -1,0 +1,5 @@
+package: github.com/pinknoisebabies/use-face-api-trial
+import:
+- package: github.com/lazywei/go-opencv
+  subpackages:
+  - opencv
